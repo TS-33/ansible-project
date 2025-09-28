@@ -1,0 +1,71 @@
+---
+# tasks file for common
+
+- name: user add
+  user:
+    name: "{{ user.name }}"
+    password: "{{ user.password|password_hash('sha512') }}"
+    state: present
+- name: sudo
+  lineinfile:
+    line: "{{ user.name }}    ALL=(ALL)   ALL"
+    path: /etc/sudoers
+  when: user.sudo == 'yes'
+
+
+- name: .ssh/ mkdir
+  file:
+    path: ~/.ssh
+    state: directory
+- name: authorized_keys file touch
+  file:
+    path: ~/.ssh/authorized_keys 
+    state: touch
+    mode: '0600'
+- name: ssh-no-password
+  lineinfile:
+    line: "{{ lookup('file',ssh_pub_key) }}"
+    path: ~/.ssh/authorized_keys
+
+- name: timezone set
+  shell: "timedatectl set-timezone {{ timezone }}"
+
+- name: firewalld disable
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: firewalld_disable == 'yes'
+- name: firewalld pass port
+  firewalld:
+    port: "{{ allow_port }}"
+    permanent: true
+    state: enabled
+    immediate: yes
+  when: firewalld_disable == 'no'
+
+- name: selinux disable
+  block: 
+    - selinux:
+        state: disabled
+    - shell: "setenforce 0"
+  when: selinux_disable == 'yes'
+
+
+- name: yum_repo gpgcheck enabled
+  yum_repository:
+    baseurl: "{{ yum_repo.baseurl }}"
+    name: "{{ yum_repo.name }}"
+    file: "{{ yum_repo.file }}"
+    enabled: "{{ yum_repo.enabled }}"
+    gpgkey: "{{ yum_repo.gpgkey }}"
+  when: yum_repo.gpgcheck == 'yes'
+- name: yum_repo gpgcheck disabled
+  yum_repository:
+    baseurl: "{{ yum_repo.baseurl }}"
+    name: "{{ yum_repo.name }}"
+    file: "{{ yum_repo.file }}"
+    enabled: "{{ yum_repo.enabled }}"
+  when: yum_repo.gpgcheck == 'no'
+
+

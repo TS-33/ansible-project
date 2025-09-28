@@ -1,0 +1,36 @@
+---
+# defaults file for common
+
+
+
+# path to ssh_key_file
+ssh_pub_key: '~/.ssh/id_rsa.pub'
+
+# the user to create
+user:
+  name: "guest"
+  sudo: yes
+  password: "123.com"
+
+# the timezone to set
+timezone: 'Asia/Shanghai'
+
+# would you like to disable the firewall? <'yes' or 'no'>
+firewalld_disable: no
+
+# firewall allow port
+allow_port: '80/tcp'
+
+# would you like to disable the selinux? <'yes' or 'no'>
+selinux_disable: 'yes'
+
+# yum_repository to set, here is aliyun's repository
+yum_repo:
+  baseurl: "http://mirrors.aliyun.com/centos/{{ ansible_distribution_major_version }}/os/{{ ansible_architecture }}/"
+  name: "aliyun"
+  file: "aliyun"
+  enabled: yes
+  gpgcheck: no
+  gpgkey: ""
+
+
