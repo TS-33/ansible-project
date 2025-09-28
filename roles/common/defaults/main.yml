@@ -29,8 +29,9 @@ yum_repo:
   baseurl: "http://mirrors.aliyun.com/centos/{{ ansible_distribution_major_version }}/os/{{ ansible_architecture }}/"
   name: "aliyun"
   file: "aliyun"
+  description: "ansible made"
   enabled: yes
-  gpgcheck: no
+  gpgcheck: 'no'
   gpgkey: ""
 
 

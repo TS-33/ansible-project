@@ -48,13 +48,15 @@
   block: 
     - selinux:
         state: disabled
-    - shell: "setenforce 0"
+    - debug:
+        msg: selinux's configure restart to take effect
   when: selinux_disable == 'yes'
 
 
 - name: yum_repo gpgcheck enabled
   yum_repository:
     baseurl: "{{ yum_repo.baseurl }}"
+    description: "{{ yum_repo.description }}"
     name: "{{ yum_repo.name }}"
     file: "{{ yum_repo.file }}"
     enabled: "{{ yum_repo.enabled }}"
@@ -63,6 +65,7 @@
 - name: yum_repo gpgcheck disabled
   yum_repository:
     baseurl: "{{ yum_repo.baseurl }}"
+    description: "{{ yum_repo.description }}"
     name: "{{ yum_repo.name }}"
     file: "{{ yum_repo.file }}"
     enabled: "{{ yum_repo.enabled }}"
