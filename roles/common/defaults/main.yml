@@ -1,8 +1,6 @@
 ---
 # defaults file for common
 
-
-
 # path to ssh_key_file
 ssh_pub_key: '~/.ssh/id_rsa.pub'
 
