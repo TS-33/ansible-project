@@ -1,0 +1,57 @@
+---
+# tasks file for nginx
+
+#install by yum:
+- name: yum install nginx
+  yum:
+    name: nginx
+    state: present
+  ignore_errors: yes
+  register: yum_nginx
+
+
+#install by url    
+- name: friendly msg
+  debug:
+    msg: yum install nginx failed, now try url install...
+- name: url install nginxa
+  block:
+    - name: download nginx-1.24.0.tar.gz
+      get_url:
+        url: https://nginx.org/download/nginx-1.24.0.tar.gz
+        dest: /opt/
+        force: no
+    - name: tar -xzf nginx-1.24.0.tar.gz
+      ansible.builtin.unarchive:
+        src: /opt/nginx-1.24.0.tar.gz
+        dest: /opt/
+        remote_src: yes
+    - name: yum install nginx's rely
+      yum:
+        name:
+          - gcc
+          - make
+          - pcre-devel
+          - openssl-devel
+        state: present
+    - name: check if nginx is already install?
+      stat:
+        path: /usr/local/nginx
+      register: stat_rst
+    - name: install nginx
+      block:
+        - name: configure with ssl and theads module
+          shell: 'cd /opt/nginx-1.24.0/ && ./configure --with-http_ssl_module --with-threads'
+        - name: make and make install
+          shell: 'cd /opt/nginx-1.24.0 && make && make install'
+      when: stat_rst.stat.exists is false
+    - name: cp nginx command to /usr/local/bin
+      file:
+        src: /usr/local/nginx/sbin/nginx
+        dest: /usr/local/bin/nginx
+        state: link
+  when: yum_nginx.failed is true
+
+- name: friendly msg
+  debug:
+    msg: nginx install success
