@@ -1,4 +1,7 @@
 - name: for test
   hosts: test
   roles:
-    - common
+    - nginx
+  tasks:
+    - debug:
+        var: php_fpm_enable

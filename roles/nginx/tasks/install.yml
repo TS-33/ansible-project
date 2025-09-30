@@ -8,13 +8,17 @@
     state: present
   ignore_errors: yes
   register: yum_nginx
-
+- name: set var:nginx_conf_path
+  set_fact:
+    nginx_install_method: yum
+    nginx_conf_path: /etc/nginx/nginx.conf
+    nginx_web_path: /usr/share/nginx/html/
 
 #install by url    
 - name: friendly msg
   debug:
     msg: yum install nginx failed, now try url install...
-- name: url install nginxa
+- name: url install nginx
   block:
     - name: download nginx-1.24.0.tar.gz
       get_url:
@@ -22,7 +26,7 @@
         dest: /opt/
         force: no
     - name: tar -xzf nginx-1.24.0.tar.gz
-      ansible.builtin.unarchive:
+      unarchive:
         src: /opt/nginx-1.24.0.tar.gz
         dest: /opt/
         remote_src: yes
@@ -50,6 +54,11 @@
         src: /usr/local/nginx/sbin/nginx
         dest: /usr/local/bin/nginx
         state: link
+    - name: set var:nginx_conf_path
+      set_fact:
+        nginx_install_method: url
+        nginx_conf_path: /usr/local/nginx/conf/nginx.conf
+        nginx_web_path:  /usr/local/nginx/html/
   when: yum_nginx.failed is true
 
 - name: friendly msg

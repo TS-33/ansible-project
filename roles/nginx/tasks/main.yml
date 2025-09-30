@@ -1,13 +1,29 @@
 ---
 # tasks file for nginx
 
-- name: which nginx
+- name: determine if nginx exist
   shell: "which nginx"
   ignore_errors: yes
   register: nginx_exist
-
 - name: install nginx if it not installed
   include_tasks: install.yml
   when: nginx_exist.rc != 0
 
+- name: useradd nginx
+  user:
+    name: "{{ nginx_user }}"
+    state: present
+  when: nginx_user is defined
 
+- name: template config
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_path }}"
+
+- name: copy web file
+  copy:
+    src: web_files/
+    dest: "{{ nginx_web_path }}"
+
+- name: create a systemd service file; start and enable nginx
+  import_tasks: systemd.yml
