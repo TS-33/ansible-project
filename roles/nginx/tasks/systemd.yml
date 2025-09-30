@@ -23,27 +23,6 @@
     path: /etc/systemd/system/nginx.service
   when: nginx_install_method == 'url'
 
-- name: make systemd file
-  blockinfile:
-    block: |
-      [Unit]
-      Description=Nginx Web Server (yum installation)
-      After=network.target
-      
-      [Service]
-      Type=forking
-      ExecStart=/usr/sbin/nginx
-      ExecReload=/usr/sbin/nginx -s reload
-      ExecStop=/usr/sbin/nginx -s stop
-      PIDFile=/var/run/nginx.pid
-      Restart=on-failure
-      RestartSec=5s
-      
-      [Install]
-      WantedBy=multi-user.target
-    path: /etc/systemd/system/nginx.service
-  when: nginx_install_method == 'yum'
-
 - name: start and enable nginx
   systemd:
     name: nginx
